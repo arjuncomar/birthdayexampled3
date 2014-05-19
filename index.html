@@ -12,16 +12,24 @@
         stroke: #999;
         stroke-opacity: .6;
     }
+    .chart rect {
+        fill: steelblue;
+    }
+
+    .chart text {
+        fill: white;
+        font: 10px sans-serif;
+        text-anchor: middle;
+    }
     </style>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="dates.js"></script>
 </head>
 <body>
+    <svg class="chart"></svg>
 	<script>
-    var update = function () {};
-
-    var width = 960,
+    var width = 600,
         height = 500;
     
     var color = d3.scale.category20();
@@ -40,6 +48,13 @@
 
     var selected_color = d3.rgb(0, 0, 255),
         normal_color = d3.rgb(100, 100, 100);
+
+    var y = d3.scale.linear()
+              .range([height, 0]);
+
+    var chart = d3.select(".chart")
+                  .attr("width", width)
+                  .attr("height", height);
 
     d3.json('birthdays.json', function(error, graph) {
         force.nodes(graph.nodes).start();
@@ -60,14 +75,34 @@
                 .attr("cy", function(d) { return d.y; });
 
             node.style("fill", function (n) {
-                    var date = date_format.parse(n.birthday);
-                    if(date <= end_date && date >= start_date) {
-                        return selected_color;
-                    } else {
-                        return normal_color;        
-                    }
-                });
+                var date = date_format.parse(n.birthday);
+                if(date <= end_date && date >= start_date) {
+                    return selected_color;
+                } else {
+                    return normal_color;        
+                }
+            });
         });
+
+        y.domain([0, d3.max(graph.nodes, function(d) { return date_format.parse(d.birthday).getMonth(); })]);
+
+        var barWidth = width / graph.nodes.length;
+
+        var bar = chart.selectAll("g")
+                       .data(graph.nodes)
+                       .enter().append("g")
+                       .attr("transform", function(d, i) { return "translate(" + i * barWidth + ",0)"; });
+
+        bar.append("rect")
+           .attr("y", function(d) { return height - 10*(date_format.parse(d.birthday).getMonth() + 2); })
+           .attr("height", function(d) { return height - 10*(date_format.parse(d.birthday).getMonth() + 2); })
+           .attr("width", barWidth - 1);
+
+        bar.append("text")
+           .attr("x", barWidth / 2)
+           .attr("y", function(d) { return height - 10 * (2 + date_format.parse(d.birthday).getMonth()) + 3; })
+           .attr("dy", ".75em")
+           .text(function(d) { return d.name; });
         
     });
 
