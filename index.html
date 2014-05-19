@@ -57,7 +57,15 @@
                   .attr("width", width)
                   .attr("height", height);
 
+    var barCount = 5;
+    var getMonth = function(d) { return d.birthday.getMonth(); }
+
     d3.json('birthdays.json', function(error, graph) {
+        graph.nodes = graph.nodes.map(function(d) {
+            d.birthday = date_format.parse(d.birthday);    
+            return d;
+        });
+
         force.nodes(graph.nodes).start();
         var node = svg.selectAll(".node")
                       .data(graph.nodes)
@@ -68,15 +76,12 @@
 
         node.append("title").text(function (d) { return d.name; });
 
-        var update = function() {
-        }
-
         force.on("tick", function() {
             node.attr("cx", function(d) { return d.x; })
                 .attr("cy", function(d) { return d.y; });
 
             node.style("fill", function (n) {
-                var date = date_format.parse(n.birthday);
+                var date = n.birthday;
                 if(date <= end_date && date >= start_date) {
                     return selected_color;
                 } else {
@@ -85,7 +90,10 @@
             });
         });
 
-        y.domain([0, d3.max(graph.nodes, function(d) { return date_format.parse(d.birthday).getMonth(); })]);
+        y.domain([0, d3.max(graph.nodes, getMonth)]);
+
+        var mx = d3.max(graph.nodes, getMonth),
+            mn = d3.min(graph.nodes, getMonth);
 
         var barWidth = width / graph.nodes.length;
 
@@ -95,13 +103,13 @@
                        .attr("transform", function(d, i) { return "translate(" + i * barWidth + ",0)"; });
 
         bar.append("rect")
-           .attr("y", function(d) { return height - 10*(date_format.parse(d.birthday).getMonth() + 2); })
-           .attr("height", function(d) { return height - 10*(date_format.parse(d.birthday).getMonth() + 2); })
+           .attr("y", function(d) { return height - 10*(d.birthday.getMonth() + 2); })
+           .attr("height", function(d) { return height - 10*(d.birthday.getMonth() + 2); })
            .attr("width", barWidth - 1);
 
         bar.append("text")
            .attr("x", barWidth / 2)
-           .attr("y", function(d) { return height - 10 * (2 + date_format.parse(d.birthday).getMonth()) + 3; })
+           .attr("y", function(d) { return height - 10 * (2 + d.birthday.getMonth()) + 3; })
            .attr("dy", ".75em")
            .text(function(d) { return d.name; });
         
