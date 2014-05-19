@@ -15,6 +15,7 @@
     </style>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="dates.js"></script>
 </head>
 <body>
 	<script>
@@ -33,6 +34,10 @@
                 .attr("width", width)
                 .attr("height", height)
 
+
+    var start_date = date_format.parse("1/1/1990"),
+        end_date   = date_format.parse("12/31/1992");
+
     d3.json('birthdays.json', function(error, graph) {
         force.nodes(graph.nodes).start();
         var node = svg.selectAll(".node")
@@ -40,17 +45,29 @@
                       .enter().append("circle")
                       .attr("class", "node")
                       .attr("r", 5)
-                      .style("fill", function (d) { return color(5); })
                       .call(force.drag);
 
         node.append("title").text(function (d) { return d.name; });
 
+        var update = function() {
+        }
+
         force.on("tick", function() {
             node.attr("cx", function(d) { return d.x; })
                 .attr("cy", function(d) { return d.y; });
+
+            node.style("fill", function (n) {
+                    var date = date_format.parse(n.birthday);
+                    if(date <= end_date && date >= start_date) {
+                        return d3.rgb(0, 0, 255);
+                    } else {
+                        return d3.rgb(0, 255, 0);        
+                    }
+                });
         });
+        
     });
-	
+
 	</script>
 </body>
 </html>	
