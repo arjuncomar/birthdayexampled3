@@ -1,7 +1,18 @@
 <html>
 <head>
 	<title>Birthday Example!!!</title>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 </head>
-<body></body>
+<body>
+	<script>
+	$.getJSON('birthdays.json', function(data){
+		console.log("Something something");
+		console.log(data);
+		
+		
+	});
+	
+	</script>
+</body>
 </html>	
