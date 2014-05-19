@@ -38,6 +38,9 @@
     var start_date = date_format.parse("1/1/1990"),
         end_date   = date_format.parse("12/31/1992");
 
+    var selected_color = d3.rgb(0, 0, 255),
+        normal_color = d3.rgb(0, 255, 0);
+
     d3.json('birthdays.json', function(error, graph) {
         force.nodes(graph.nodes).start();
         var node = svg.selectAll(".node")
@@ -59,9 +62,9 @@
             node.style("fill", function (n) {
                     var date = date_format.parse(n.birthday);
                     if(date <= end_date && date >= start_date) {
-                        return d3.rgb(0, 0, 255);
+                        return selected_color;
                     } else {
-                        return d3.rgb(0, 255, 0);        
+                        return normal_color;        
                     }
                 });
         });
