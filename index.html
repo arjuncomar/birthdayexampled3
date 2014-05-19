@@ -39,7 +39,7 @@
         end_date   = date_format.parse("12/31/1992");
 
     var selected_color = d3.rgb(0, 0, 255),
-        normal_color = d3.rgb(0, 255, 0);
+        normal_color = d3.rgb(100, 100, 100);
 
     d3.json('birthdays.json', function(error, graph) {
         force.nodes(graph.nodes).start();
